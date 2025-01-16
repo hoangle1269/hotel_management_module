@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="report_hotel_booking" model="ir.actions.report">
+        <field name="name">Booking Confirmation</field>
+        <field name="model">hotel.booking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hotel_management.report_booking_template</field>
+        <field name="report_file">hotel_management.report_booking_template</field>
+        <field name="binding_model_id" ref="model_hotel_booking"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_booking_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="booking">
+                <t t-call="web.external_layout">
+                    <div class="page">
+                        <h2>Booking Confirmation</h2>
+                        <div class="row mt32 mb32">
+                            <div class="col-6">
+                                <strong>Booking Reference:</strong>
+                                <span t-field="booking.code"/>
+                                <br/>
+                                <strong>Guest Name:</strong>
+                                <span t-field="booking.guest_name"/>
+                                <br/>
+                                <strong>Contact:</strong>
+                                <span t-field="booking.guest_contact"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Hotel:</strong>
+                                <span t-field="booking.hotel_id.name"/>
+                                <br/>
+                                <strong>Room:</strong>
+                                <span t-field="booking.room_id.code"/>
+                                <br/>
+                                <strong>Status:</strong>
+                                <span t-field="booking.status"/>
+                            </div>
+                        </div>
+                        <div class="row mt32 mb32">
+                            <div class="col-6">
+                                <strong>Check-in Date:</strong>
+                                <span t-field="booking.check_in_date"/>
+                                <br/>
+                                <strong>Check-out Date:</strong>
+                                <span t-field="booking.check_out_date"/>
+                            </div>
+                            <div class="col-6">
+                                <strong>Total Nights:</strong>
+                                <span t-field="booking.total_nights"/>
+                                <br/>
+                                <strong>Total Amount:</strong>
+                                <span t-field="booking.total_amount"/>
+                            </div>
+                        </div>
+                        <div class="row mt32 mb32">
+                            <div class="col-12">
+                                <strong>Room Features:</strong>
+                                <span t-field="booking.room_id.feature_ids"/>
+                            </div>
+                        </div>
+                    </div>
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>

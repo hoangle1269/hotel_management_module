@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="menu_hotel_root" name="Hotel Management" sequence="1"/>
+
+        <menuitem id="menu_booking" name="Bookings"
+                  parent="menu_hotel_root"
+                  action="action_booking" sequence="10"/>
+
+        <menuitem id="menu_hotel" name="Hotels"
+                  parent="menu_hotel_root"
+                  action="action_hotel" sequence="20"/>
+
+        <menuitem id="menu_room" name="Rooms"
+                  parent="menu_hotel_root"
+                  action="action_room" sequence="30"/>
+
+        <menuitem id="menu_feature" name="Features"
+                  parent="menu_hotel_root"
+                  action="action_feature" sequence="40"/>
+
+        <menuitem id="menu_booking_pending" name="New Booking"
+                  parent="menu_hotel_root"
+                  action="action_booking_pending" sequence="40"/>
+
+<!--        <menuitem id="menu_booking_payment" name="Booking Payment"-->
+<!--                  parent="menu_hotel_root"-->
+<!--                  action="action_booking_payment" sequence="40"/>-->
+
+        <menuitem id="menu_booking_payment" name="Payment"
+                  parent="menu_hotel_root"
+                  action="action_booking_order_payment" sequence="40"/>
+
+    </data>
+</odoo>

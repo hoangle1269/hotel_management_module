@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Define groups-->
+<odoo>
+    <data noupdate="0">
+        <!-- Module Category: Hotel -->
+        <record id="module_category_hotel_management" model="ir.module.category">
+            <field name="name">Hotel Management</field>
+            <field name="description">Hotel staff rules</field>
+            <field name="sequence">20</field>
+        </record>
+
+        <!-- Groups: Employees -->
+        <record id="group_hotel_employee" model="res.groups">
+            <field name="name">Employees</field>
+            <field name="category_id" ref="hotel_management_module.module_category_hotel_management"/>
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+        </record>
+        <!-- Groups: Managers -->
+        <record id="group_hotel_manager" model="res.groups">
+            <field name="name">Managers</field>
+            <field name="category_id" ref="hotel_management_module.module_category_hotel_management"/>
+            <field name="implied_ids" eval="[(4, ref('hotel_management_module.group_hotel_employee'))]"/>
+        </record>
+
+        <!-- Administrators -->
+        <record id="group_hotel_admin" model="res.groups">
+            <field name="name">Administrators</field>
+            <field name="category_id" ref="module_category_hotel_management"/>
+            <field name="implied_ids" eval="[(4, ref('hotel_management_module.group_hotel_manager'))]"/>
+        </record>
+    </data>
+</odoo>

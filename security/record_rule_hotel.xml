@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <data>
+        <record id="rule_hotel_employee" model="ir.rule">
+            <field name="name">Hotel Employee</field>
+            <field name="model_id" ref="hotel_management_module.model_hotel_hotel"/>
+            <field name="groups" eval="[(4, ref('hotel_management_module.group_hotel_employee'))]"/>
+            <field name="domain_force">[('manager_id.user_id', '=', user.employee_parent_id.user_id.id)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="rule_hotel_manager" model="ir.rule">
+            <field name="name">Hotel Manager</field>
+            <field name="model_id" ref="hotel_management_module.model_hotel_hotel"/>
+            <field name="groups" eval="[(4, ref('hotel_management_module.group_hotel_manager'))]"/>
+            <field name="domain_force">[('manager_id.user_id', '=', user.id)]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="0"/>
+            <field name="perm_create" eval="0"/>
+            <field name="perm_unlink" eval="0"/>
+        </record>
+
+        <record id="rule_hotel_admin" model="ir.rule">
+            <field name="name">Hotel Admin</field>
+            <field name="model_id" ref="hotel_management_module.model_hotel_hotel"/>
+            <field name="groups" eval="[(4, ref('hotel_management_module.group_hotel_admin'))]"/>
+            <field name="domain_force">[]</field>
+            <field name="perm_read" eval="1"/>
+            <field name="perm_write" eval="1"/>
+            <field name="perm_create" eval="1"/>
+            <field name="perm_unlink" eval="1"/>
+        </record>
+    </data>
+</odoo>

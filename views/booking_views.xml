@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Booking List View -->
+        <record id="view_booking_list" model="ir.ui.view">
+            <field name="name">hotel.booking.list</field>
+            <field name="model">hotel.booking</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="booking_code"/>
+                    <field name="room_id"/>
+                    <field name="hotel_id"/>
+                    <field name="guest_name"/>
+                    <field name="booking_date"/>
+                    <field name="check_in_date"/>
+                    <field name="check_out_date"/>
+                    <field name="booking_status"/>
+                    <field name="total_amount"/>
+                    <field name="payment_status"/>
+                    <button name="action_open_payment_wizard" type="object" string="Pay"
+                            invisible="payment_status == 'paid'" class="btn-primary"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Booking Form View -->
+        <record id="view_booking_form" model="ir.ui.view">
+            <field name="name">hotel.booking.form</field>
+            <field name="model">hotel.booking</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="booking_code" readonly="1"/>
+                                <field name="room_id"/>
+                                <field name="hotel_id"/>
+                                <field name="guest_name"/>
+                                <field name="guest_contact"/>
+                                <field name="booking_date"/>
+                            </group>
+                            <group>
+                                <field name="check_in_date" options="{'datepicker': {'warn_future': false}}"/>
+                                <field name="check_out_date" options="{'datepicker': {'warn_future': false}}"/>
+                                <field name="total_nights"/>
+                                <field name="total_amount"/>
+                                <field name="booking_status"/>
+                                <field name="payment_status"/>
+                            </group>
+                            <group>
+                                <field name="hotel_id"/>
+                                <field name="room_type"/>
+                                <field name="room_id"
+                                       domain="[('hotel_id', '=', hotel_id), ('bed_type', '=', room_type)]"
+                                       options="{'no_open': True}"/>
+<!--                                <field name="room_name"/>-->
+                                <field name="booking_status" />
+                                <field name="payment_status" readonly="1"/>
+                                <field name="payment_date" readonly="1"/>
+                                <field name="payment_amount" readonly="1"/>
+
+                                <button name="action_open_payment_wizard"
+                                        string="Pay"
+                                        type="object"
+                                        invisible="payment_status != 'unpaid'"/>
+                                <button name="action_create_invoice"
+                                        string="Create Invoice" type="object" class="btn-primary"/>
+                            </group>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- Booking Search View -->
+        <record id="view_booking_search" model="ir.ui.view">
+            <field name="name">hotel.booking.search</field>
+            <field name="model">hotel.booking</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="booking_code"/>
+                    <field name="guest_name"/>
+                    <field name="room_id"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_booking" model="ir.actions.act_window">
+            <field name="name">Bookings</field>
+            <field name="res_model">hotel.booking</field>
+            <field name="view_mode">list,form</field>
+            <!--        <field name="context">{}</field>-->
+        </record>
+    </data>
+</odoo>

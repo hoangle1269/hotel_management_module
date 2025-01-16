@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hotel_hotel_employee,hotel.hotel.employee,model_hotel_hotel,group_hotel_employee,1,0,0,0
+access_hotel_hotel_manager,hotel.hotel.manager,model_hotel_hotel,group_hotel_manager,1,1,1,0
+access_hotel_hotel_admin,hotel.hotel.admin,model_hotel_hotel,group_hotel_admin,1,1,1,1
+access_hotel_room_employee,hotel.room.employee,model_hotel_room,group_hotel_employee,1,1,0,0
+access_hotel_room_manager,hotel.room.manager,model_hotel_room,group_hotel_manager,1,1,1,0
+access_hotel_room_admin,hotel.room.admin,model_hotel_room,group_hotel_admin,1,1,1,1
+access_hotel_feature_employee,hotel.feature.employee,model_hotel_feature,group_hotel_employee,1,1,1,0
+access_hotel_feature_manager,hotel.feature.manager,model_hotel_feature,group_hotel_manager,1,1,1,0
+access_hotel_feature_admin,hotel.feature.admin,model_hotel_feature,group_hotel_admin,1,1,1,1
+access_hotel_booking_employee,hotel.booking.employee,model_hotel_booking,group_hotel_employee,1,1,1,0
+access_hotel_booking_manager,hotel.booking.manager,model_hotel_booking,group_hotel_manager,1,1,1,1
+access_hotel_booking_admin,hotel.booking.admin,model_hotel_booking,group_hotel_admin,1,1,1,1
+access_hotel_payment_wizard_employee,hotel.payment.wizard.employee,model_hotel_payment_wizard,group_hotel_employee,1,1,1,0
+access_hotel_payment_wizard_manager,hotel.payment.wizard.manager,model_hotel_payment_wizard,group_hotel_manager,1,1,1,1
+access_hotel_payment_wizard_admin,hotel.payment.wizard.admin,model_hotel_payment_wizard,group_hotel_admin,1,1,1,1

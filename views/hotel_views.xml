@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Hotel List View -->
+        <record id="view_hotel_list" model="ir.ui.view">
+            <field name="name">hotel.hotel.list</field>
+            <field name="model">hotel.hotel</field>
+            <field name="arch" type="xml">
+                <list>
+                    <field name="hotel_code"/>
+                    <field name="hotel_name"/>
+                    <field name="hotel_address"/>
+                    <field name="manager_id"/>
+                    <field name="employee_ids"/>
+                    <field name="number_of_floors"/>
+                    <field name="number_of_rooms"/>
+                    <field name="hotel_active"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Hotel Form View -->
+        <record id="view_hotel_form" model="ir.ui.view">
+            <field name="name">hotel.hotel.form</field>
+            <field name="model">hotel.hotel</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="hotel_code"/>
+                            <field name="hotel_name"/>
+                            <field name="hotel_address"/>
+                            <field name="manager_id"/>
+                            <field name="number_of_floors"/>
+                            <field name="number_of_rooms"/>
+                        </group>
+                        <group>
+                            <field name="hotel_active"/>
+                        </group>
+                        <notebook>
+                            <page string="Rooms" name="rooms">
+                                <field name="room_ids" nolabel="1">
+                                    <list string="Rooms" editable="bottom">
+                                        <field name="room_code"/>
+                                        <field name="room_name"/>
+                                        <field name="bed_type"/>
+                                        <field name="room_price"/>
+                                        <field name="room_status"/>
+                                        <field name="room_active"/>
+                                    </list>
+                                </field>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <!-- Hotel Search View -->
+        <record id="view_hotel_search" model="ir.ui.view">
+            <field name="name">hotel.hotel.search</field>
+            <field name="model">hotel.hotel</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="hotel_name"/>
+                    <field name="hotel_code"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="action_hotel" model="ir.actions.act_window">
+            <field name="name">Hotels</field>
+            <field name="res_model">hotel.hotel</field>
+            <field name="view_mode">list,form</field>
+            <!--        <field name="context">{}</field>-->
+        </record>
+    </data>
+</odoo>
