@@ -11,6 +11,6 @@ access_hotel_feature_admin,hotel.feature.admin,model_hotel_feature,group_hotel_a
 access_hotel_booking_employee,hotel.booking.employee,model_hotel_booking,group_hotel_employee,1,1,1,0
 access_hotel_booking_manager,hotel.booking.manager,model_hotel_booking,group_hotel_manager,1,1,1,1
 access_hotel_booking_admin,hotel.booking.admin,model_hotel_booking,group_hotel_admin,1,1,1,1
-access_hotel_payment_wizard_employee,hotel.payment.wizard.employee,model_hotel_payment_wizard,group_hotel_employee,1,1,1,0
-access_hotel_payment_wizard_manager,hotel.payment.wizard.manager,model_hotel_payment_wizard,group_hotel_manager,1,1,1,1
-access_hotel_payment_wizard_admin,hotel.payment.wizard.admin,model_hotel_payment_wizard,group_hotel_admin,1,1,1,1
+access_hotel_payment_wizard_employee,hotel.payment.wizard.employee,model_booking_payment_wizard,group_hotel_employee,1,1,1,0
+access_hotel_payment_wizard_manager,hotel.payment.wizard.manager,model_booking_payment_wizard,group_hotel_manager,1,1,1,1
+access_hotel_payment_wizard_admin,hotel.payment.wizard.admin,model_booking_payment_wizard,group_hotel_admin,1,1,1,1

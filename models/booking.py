@@ -7,7 +7,7 @@ from odoo.exceptions import UserError
 class HotelBooking(models.Model):
     _name = 'hotel.booking'
     _description = 'Room Booking'
-    _order = 'check_in_date desc'
+    _order = 'booking_date desc'
     _rec_name = 'booking_code'
 
     booking_code = fields.Char(string='Booking Code', readonly=True)
@@ -32,6 +32,8 @@ class HotelBooking(models.Model):
         ('cancelled', 'Cancelled')
     ], string='Booking Status', default='new')
     room_price = fields.Float(related='room_id.room_price', string='Room Price', readonly=True)
+    currency_id = fields.Many2one('res.currency', string='Currency',
+                                  default=lambda self: self.env.company.currency_id)
     total_nights = fields.Integer(string='Total Nights', compute='_compute_total_nights', store=True)
     total_amount = fields.Float(string='Total Amount', compute='_compute_total_amount', store=True)
     payment_status = fields.Selection([
@@ -46,7 +48,7 @@ class HotelBooking(models.Model):
         return {
             'name': 'Make Payment',
             'type': 'ir.actions.act_window',
-            'res_model': 'hotel.payment.wizard',
+            'res_model': 'booking.payment.wizard',
             'view_mode': 'form',
             'target': 'new',
             'context': {
@@ -59,13 +61,13 @@ class HotelBooking(models.Model):
 
     def action_confirm_payment(self):
         self.ensure_one()
-        if self.booking_id.payment_status == 'paid':
+        if self.payment_status == 'paid':
             raise ValidationError('This booking has already been paid.')
 
-        self.booking_id.write({
+        self.write({
             'payment_status': 'paid',
             'payment_date': fields.Datetime.now(),
-            'payment_amount': self.payment_amount
+            'payment_amount': self.total_amount
         })
 
         # Send confirmation email or other actions if necessary
@@ -74,10 +76,12 @@ class HotelBooking(models.Model):
         return {'type': 'ir.actions.act_window_close'}
 
     def _send_payment_confirmation(self):
-        # Optional: Send a payment confirmation email or activity
         template = self.env.ref('hotel_management_module.payment_confirmation_email_template', False)
         if template:
-            template.send_mail(self.booking_id.id, force_send=True)
+            try:
+                template.send_mail(self.id, force_send=True)
+            except Exception as e:
+                raise ValidationError(f"Failed to send email: {str(e)}")
 
     @api.model
     def _auto_cancel_draft_bookings(self):
@@ -88,8 +92,11 @@ class HotelBooking(models.Model):
         draft_bookings.write({'booking_status': 'cancelled'})
 
     def unlink(self):
-        if not self.env.user.has_group('hotel.group_hotel_manager'):
-            raise ValidationError('Only managers can delete bookings.')
+        for booking in self:
+            if booking.booking_status not in ['draft', 'cancelled']:
+                raise ValidationError('Only bookings in Draft or Cancelled status can be deleted.')
+            if not self.env.user.has_group('hotel.group_hotel_manager'):
+                raise ValidationError('Only managers can delete bookings.')
         return super(HotelBooking, self).unlink()
 
     @api.model
@@ -123,10 +130,10 @@ class HotelBooking(models.Model):
 
     def action_create_invoice(self):
         for record in self:
-            # Check if payment has already been made
-            if record.payment_status == 'paid':
-                raise UserError("Payment has already been made for this booking.")
-            # Check if a Sale Order already exists
+            # Kiểm tra trạng thái thanh toán trước
+            if record.payment_status != 'paid':
+                raise UserError("Please complete the payment before creating an invoice.")
+
             if record.sale_order_id:
                 return {
                     'type': 'ir.actions.act_window',
@@ -135,30 +142,21 @@ class HotelBooking(models.Model):
                     'res_model': 'sale.order',
                     'res_id': record.sale_order_id.id,
                 }
-            # Search for the customer in res.partner
+
             partner = self.env['res.partner'].search([('name', '=', record.guest_name)], limit=1)
-
-            # If no customer is found, create a new one
             if not partner:
-                partner = self.env['res.partner'].create({
-                    'name': record.guest_name,
-                })
+                partner = self.env['res.partner'].create({'name': record.guest_name})
 
-            # Create Sale Order
             sale_order = self.env['sale.order'].create({
                 'partner_id': partner.id,
                 'origin': record.booking_code,
             })
 
-            # Generate dynamic product name
             if record.room_id and record.check_in_date and record.check_out_date:
-                checkin = fields.Date.to_string(record.check_in_date)
-                checkout = fields.Date.to_string(record.check_out_date)
-                sale_name = f"{record.room_id.room_code}: {checkin} - {checkout}"
+                sale_name = f"{record.room_id.room_code}: {record.check_in_date} - {record.check_out_date}"
             else:
                 sale_name = "Room Booking"
 
-            # Check if a product with the same name exists, otherwise create it
             product = self.env['product.product'].search([('name', '=', sale_name)], limit=1)
             if not product:
                 product = self.env['product.product'].create({
@@ -167,26 +165,21 @@ class HotelBooking(models.Model):
                     'list_price': record.total_amount,
                 })
 
-            # Calculate stay duration in days
-            if record.check_in_date and record.check_out_date:
-                duration = (record.check_out_date - record.check_in_date).days
-                if duration <= 0:
-                    raise UserError("Check-out date must be later than check-in date.")
-            else:
-                duration = 0
+            duration = (record.check_out_date - record.check_in_date).days
+            if duration <= 0:
+                raise UserError("Check-out date must be later than check-in date.")
 
-            # Create Sale Order Line
             self.env['sale.order.line'].create({
                 'order_id': sale_order.id,
                 'name': product.name,
-                'product_uom_qty': duration or 1,  # Ensure at least 1 unit is billed
+                'product_uom_qty': max(duration, 1),
                 'price_unit': record.room_price,
                 'product_id': product.id,
             })
 
-            # Link Sale Order to Booking and Mark Payment as Paid
-            record.sale_order_id = sale_order.id
-            record.payment_status = 'unpaid'
+            record.write({
+                'sale_order_id': sale_order.id,
+            })
 
             return {
                 'type': 'ir.actions.act_window',
@@ -201,7 +194,9 @@ class HotelBooking(models.Model):
         for booking in self:
             if booking.check_in_date and booking.check_out_date:
                 if booking.check_in_date >= booking.check_out_date:
-                    raise ValidationError('Check-out date must be after check-in date')
+                    raise ValidationError('Check-out date must be later than check-in date.')
+                if booking.check_in_date < fields.Date.today():
+                    raise ValidationError('Check-in date cannot be in the past.')
 
     @api.constrains('room_id', 'check_in_date', 'check_out_date')
     def _check_room_availability(self):
@@ -244,6 +239,8 @@ class HotelBooking(models.Model):
     def action_approve(self):
         for record in self:
             if record.booking_status == 'new':
+                if record.payment_status != 'paid':
+                    raise ValidationError("Payment must be completed before approving the booking.")
                 record.write({'booking_status': 'confirmed'})
             else:
                 raise ValidationError("Only bookings in 'New' status can be approved.")

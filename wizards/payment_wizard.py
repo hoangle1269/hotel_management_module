@@ -1,10 +1,9 @@
 from odoo import models, fields, api
 from odoo.exceptions import ValidationError
-from datetime import datetime
 
 class HotelPaymentWizard(models.TransientModel):
-    _name = 'hotel.payment.wizard'
-    _description = 'Hotel Payment Wizard'
+    _name = 'booking.payment.wizard'
+    _description = 'Booking Payment Wizard'
 
     booking_id = fields.Many2one('hotel.booking', string='Booking', required=True)
     hotel_id = fields.Many2one('hotel.hotel', string='Hotel', readonly=True)

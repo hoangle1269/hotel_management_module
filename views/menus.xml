@@ -19,7 +19,7 @@
                   parent="menu_hotel_root"
                   action="action_feature" sequence="40"/>
 
-        <menuitem id="menu_booking_pending" name="New Booking"
+        <menuitem id="menu_booking_pending" name="Pending"
                   parent="menu_hotel_root"
                   action="action_booking_pending" sequence="40"/>
 
@@ -27,9 +27,9 @@
 <!--                  parent="menu_hotel_root"-->
 <!--                  action="action_booking_payment" sequence="40"/>-->
 
-        <menuitem id="menu_booking_payment" name="Payment"
-                  parent="menu_hotel_root"
-                  action="action_booking_order_payment" sequence="40"/>
+<!--        <menuitem id="menu_booking_payment" name="Payment"-->
+<!--                  parent="menu_hotel_root"-->
+<!--                  action="action_booking_payment" sequence="40"/>-->
 
     </data>
 </odoo>

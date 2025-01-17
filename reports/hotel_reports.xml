@@ -4,8 +4,8 @@
         <field name="name">Booking Confirmation</field>
         <field name="model">hotel.booking</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">hotel_management.report_booking_template</field>
-        <field name="report_file">hotel_management.report_booking_template</field>
+        <field name="report_name">hotel_management_module.report_booking_template</field>
+        <field name="report_file">hotel_management_module.report_booking_template</field>
         <field name="binding_model_id" ref="model_hotel_booking"/>
         <field name="binding_type">report</field>
     </record>
@@ -15,49 +15,183 @@
             <t t-foreach="docs" t-as="booking">
                 <t t-call="web.external_layout">
                     <div class="page">
-                        <h2>Booking Confirmation</h2>
+                        <!-- Header Section -->
+                        <div class="text-center">
+                            <h2>Hotel Booking Confirmation</h2>
+                            <p>Date: <span t-field="booking.booking_date"/></p>
+                        </div>
+
+                        <!-- Booking Information -->
                         <div class="row mt32 mb32">
                             <div class="col-6">
-                                <strong>Booking Reference:</strong>
-                                <span t-field="booking.code"/>
-                                <br/>
-                                <strong>Guest Name:</strong>
-                                <span t-field="booking.guest_name"/>
-                                <br/>
-                                <strong>Contact:</strong>
-                                <span t-field="booking.guest_contact"/>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td class="text-bold">Booking Reference:</td>
+                                        <td><span t-field="booking.booking_code"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-bold">Booking Status:</td>
+                                        <td><span t-field="booking.booking_status"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-bold">Created By:</td>
+                                        <td><span t-field="booking.create_uid"/></td>
+                                    </tr>
+                                </table>
                             </div>
                             <div class="col-6">
-                                <strong>Hotel:</strong>
-                                <span t-field="booking.hotel_id.name"/>
-                                <br/>
-                                <strong>Room:</strong>
-                                <span t-field="booking.room_id.code"/>
-                                <br/>
-                                <strong>Status:</strong>
-                                <span t-field="booking.status"/>
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td class="text-bold">Payment Status:</td>
+                                        <td><span t-field="booking.payment_status"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-bold">Payment Date:</td>
+                                        <td><span t-field="booking.payment_date"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-bold">Payment Amount:</td>
+                                        <td><span t-field="booking.payment_amount" t-options='{"widget": "monetary"}'/>
+                                        </td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
-                        <div class="row mt32 mb32">
-                            <div class="col-6">
-                                <strong>Check-in Date:</strong>
-                                <span t-field="booking.check_in_date"/>
-                                <br/>
-                                <strong>Check-out Date:</strong>
-                                <span t-field="booking.check_out_date"/>
-                            </div>
-                            <div class="col-6">
-                                <strong>Total Nights:</strong>
-                                <span t-field="booking.total_nights"/>
-                                <br/>
-                                <strong>Total Amount:</strong>
-                                <span t-field="booking.total_amount"/>
+
+                        <!-- Guest Information -->
+                        <h4>Guest Information</h4>
+                        <div class="row mt16 mb32">
+                            <div class="col-12">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td class="text-bold" width="200">Guest Name:</td>
+                                        <td><span t-field="booking.guest_name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-bold">Contact:</td>
+                                        <td><span t-field="booking.guest_contact"/></td>
+                                    </tr>
+                                </table>
                             </div>
                         </div>
+
+                        <!-- Hotel and Room Information -->
+                        <h4>Accommodation Details</h4>
+                        <div class="row mt16 mb32">
+                            <div class="col-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td class="text-bold">Hotel:</td>
+                                        <td><span t-field="booking.hotel_id.hotel_name"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-bold">Room Number:</td>
+                                        <td><span t-field="booking.room_id.room_code"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-bold">Room Type:</td>
+                                        <td><span t-field="booking.room_type"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td class="text-bold">Room Price/Night:</td>
+                                        <td><span t-field="booking.room_price" t-options='{"widget": "monetary"}'/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-bold">Room Features:</td>
+                                        <td><span t-field="booking.room_id.feature_ids"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Stay Information -->
+                        <h4>Stay Details</h4>
+                        <div class="row mt16 mb32">
+                            <div class="col-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td class="text-bold">Check-in Date:</td>
+                                        <td><span t-field="booking.check_in_date"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-bold">Check-out Date:</td>
+                                        <td><span t-field="booking.check_out_date"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-6">
+                                <table class="table table-sm">
+                                    <tr>
+                                        <td class="text-bold">Total Nights:</td>
+                                        <td><span t-field="booking.total_nights"/></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-bold">Total Amount:</td>
+                                        <td><span t-field="booking.total_amount" t-options='{"widget": "monetary"}'/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Sale Order Information -->
+                        <t t-if="booking.sale_order_id">
+                            <h4>Order Details</h4>
+                            <div class="row mt16 mb32">
+                                <div class="col-12">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Quantity</th>
+                                                <th>Unit Price</th>
+                                                <th>Subtotal</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <t t-foreach="booking.sale_order_id.order_line" t-as="line">
+                                                <tr>
+                                                    <td><span t-field="line.product_id.name"/></td>
+                                                    <td><span t-field="line.product_uom_qty"/></td>
+                                                    <td><span t-field="line.price_unit" t-options='{"widget": "monetary"}'/></td>
+                                                    <td><span t-field="line.price_subtotal" t-options='{"widget": "monetary"}'/></td>
+                                                </tr>
+                                            </t>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="3" class="text-right"><strong>Total</strong></td>
+                                                <td><span t-field="booking.sale_order_id.amount_total" t-options='{"widget": "monetary"}'/></td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </t>
+
+                        <!-- Terms and Conditions -->
                         <div class="row mt32 mb32">
                             <div class="col-12">
-                                <strong>Room Features:</strong>
-                                <span t-field="booking.room_id.feature_ids"/>
+                                <h4>Terms and Conditions</h4>
+                                <ul>
+                                    <li>Check-in time is 2:00 PM and check-out time is 12:00 PM</li>
+                                    <li>Early check-in and late check-out are subject to availability</li>
+                                    <li>All cancellations must be made 24 hours prior to arrival</li>
+                                    <li>Valid ID is required at check-in</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Signature Section -->
+                        <div class="row mt32">
+                            <div class="col-6">
+                                <p>Guest Signature: _________________</p>
+                            </div>
+                            <div class="col-6 text-right">
+                                <p>Hotel Representative: _________________</p>
                             </div>
                         </div>
                     </div>
