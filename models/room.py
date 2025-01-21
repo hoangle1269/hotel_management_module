@@ -1,5 +1,6 @@
 from odoo import models, fields, api
 from datetime import timedelta
+from odoo.exceptions import ValidationError
 import logging
 
 _logger = logging.getLogger(__name__)
@@ -13,12 +14,15 @@ class HotelRoom(models.Model):
     room_code = fields.Char(string='Room Code', required=True)
     room_name = fields.Char(string='Room Name', required=True)
     hotel_id = fields.Many2one('hotel.hotel', string='Hotel', required=True)
-    bed_type = fields.Selection([
+    room_type = fields.Selection([
         ('single', 'Single'),
         ('double', 'Double'),
         ('suite', 'Suite')
-    ], string='Bed Type', required=True)
-    room_price = fields.Float(string='Price per Night', required=True)
+    ], string='Room Type', required=True)
+    room_price = fields.Float(string='Base Price', required=True,
+                              help="Standard room price for weekdays")
+    current_price = fields.Float(string='Current Price', compute='_compute_current_price', store=True,
+                                 help="Current room price based on whether it's a weekday or weekend")
     feature_ids = fields.Many2many('hotel.feature', string='Features')
     room_status = fields.Selection([
         ('available', 'Available'),
@@ -32,6 +36,39 @@ class HotelRoom(models.Model):
     _sql_constraints = [
         ('unique_room_code_hotel', 'UNIQUE(room_code, hotel_id)', 'Room code must be unique per hotel!')
     ]
+
+    @api.depends('room_price')
+    def _compute_current_price(self):
+        today = fields.Date.today()
+        is_weekend = today.weekday() >= 5  # 5 là thứ 7, 6 là chủ nhật
+        for room in self:
+            # Kiểm tra xem phòng có được thuê trong 7 ngày qua không
+            if room.last_rented_date and (today - room.last_rented_date).days >= 7:
+                base_price = room.room_price * 0.9  # Giảm 10% nếu không được thuê trong 7 ngày
+            else:
+                base_price = room.room_price
+
+            # Tính giá cuối tuần (tăng 50%)
+            if is_weekend:
+                room.current_price = base_price * 1.5
+            else:
+                room.current_price = base_price
+
+    @api.constrains('room_price')
+    def _check_price(self):
+        for room in self:
+            if room.room_price <= 0:
+                raise ValidationError('Room price must be greater than zero.')
+
+    @api.depends('room_status')
+    def _compute_room_status(self):
+        for room in self:
+            if room.room_status == 'occupied':
+                room.room_status = 'occupied'
+            elif room.room_status == 'maintenance':
+                room.room_status = 'maintenance'
+            else:
+                room.room_status = 'available'
 
     def _valid_field_parameter(self, field, name):
         return name == 'tracking' or super()._valid_field_parameter(field, name)
@@ -56,7 +93,7 @@ class HotelRoom(models.Model):
 
             # Apply 10% discount
             room.room_price *= 0.9
-            room.message_post(body="Room price reduced by 10% due to being unrented for a week.")
+            room.message_post(body="Room base rate reduced by 10% due to being unrented for a week.")
             room.message_post(
                 body=f"Room has not been rented for more than 7 days (Last rental: {room.last_rented_date})",
                 subject="Unrented Room Alert"

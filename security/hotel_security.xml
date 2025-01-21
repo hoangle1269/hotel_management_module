@@ -15,6 +15,12 @@
             <field name="category_id" ref="hotel_management_module.module_category_hotel_management"/>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
         </record>
+         <!--        User-->
+<!--        <record id="group_hotel_user" model="res.groups">-->
+<!--            <field name="name">Users</field>-->
+<!--            <field name="category_id" ref="module_hotel_management.module_category_hotel_management"/>-->
+<!--            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>-->
+<!--        </record>-->
         <!-- Groups: Managers -->
         <record id="group_hotel_manager" model="res.groups">
             <field name="name">Managers</field>
@@ -28,5 +34,6 @@
             <field name="category_id" ref="module_category_hotel_management"/>
             <field name="implied_ids" eval="[(4, ref('hotel_management_module.group_hotel_manager'))]"/>
         </record>
+
     </data>
 </odoo>

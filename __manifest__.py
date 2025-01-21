@@ -1,16 +1,13 @@
 {
     'name': 'Hotel Management',
-    'version': '1.0',
+    'version': '18.0.1.0.0',
     'category': 'Services/Hotel',
-    'summary': 'Manage hotels, rooms, and bookings',
+    'summary': 'Hotel Management System',
     'description': """
-        Hotel Management Module for Odoo 18
-        - Hotel Information Management
-        - Room Management
-        - Booking System
-        - Feature Management
+        Hotel Management module for managing rooms, bookings, and services.
+        Includes integration with Sales, Inventory and POS.
     """,
-    'depends': ['base', 'mail', 'hr', 'sale'],
+    'depends': ['base', 'sale_management', 'stock', 'point_of_sale', 'sale', 'website'],
     'data': [
         'security/hotel_security.xml',
         'security/ir.model.access.csv',

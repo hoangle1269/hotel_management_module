@@ -44,30 +44,54 @@
                                 <field name="check_out_date" options="{'datepicker': {'warn_future': false}}"/>
                                 <field name="total_nights"/>
                                 <field name="total_amount"/>
-                                <field name="booking_status"/>
                                 <field name="payment_status"/>
                             </group>
                             <group>
                                 <field name="hotel_id"/>
                                 <field name="room_type"/>
                                 <field name="room_id"
-                                       domain="[('hotel_id', '=', hotel_id), ('bed_type', '=', room_type)]"
+                                       domain="[('hotel_id', '=', hotel_id), ('room_type', '=', room_type)]"
                                        options="{'no_open': True}"/>
                                 <!--                                <field name="room_name"/>-->
                                 <field name="booking_status"/>
                                 <field name="payment_status" readonly="1"/>
                                 <field name="payment_date" readonly="1"/>
                                 <field name="payment_amount" readonly="1"/>
-
-                                <button name="action_open_payment_wizard"
-                                        string="Pay"
+                            </group>
+                            <group string="Actions">
+                                <button name="action_confirm"
+                                        string="Confirm Booking"
                                         type="object"
-                                        invisible="payment_status != 'unpaid'"/>
+                                        class="btn-primary"
+                                        invisible="booking_status != 'new'"/>
+                                <button name="action_check_in"
+                                        string="Check In"
+                                        type="object"
+                                        class="btn-success"
+                                        invisible="booking_status != 'confirmed'"/>
+                                <button name="action_check_out"
+                                        string="Check Out"
+                                        type="object"
+                                        class="btn-danger"
+                                        invisible="booking_status != 'checked_in'"/>
+                                <button name="action_cancel"
+                                        string="Cancel Booking"
+                                        type="object"
+                                        class="btn-secondary"
+                                        invisible="booking_status in ['checked_in', 'checked_out']"/>
                                 <button name="action_create_invoice"
                                         string="Create Invoice"
                                         type="object"
-                                        class="btn-primary"
+                                        class="btn-warning"
                                         invisible="payment_status != 'paid'"/>
+                            </group>
+
+                            <group string="Payment">
+                                <button name="action_open_payment_wizard"
+                                        string="Pay"
+                                        type="object"
+                                        class="btn-primary"
+                                        invisible="payment_status != 'unpaid'"/>
                             </group>
                         </group>
                     </sheet>

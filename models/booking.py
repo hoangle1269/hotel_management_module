@@ -9,19 +9,17 @@ class HotelBooking(models.Model):
     _description = 'Room Booking'
     _order = 'booking_date desc'
     _rec_name = 'booking_code'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     booking_code = fields.Char(string='Booking Code', readonly=True)
     room_id = fields.Many2one('hotel.room', string='Room', required=True)
-    room_type = fields.Selection([
-        ('single', 'Single Bed'),
-        ('double', 'Double Bed')
-    ], string="Room Type", required=True)
+    room_type = fields.Selection(related='room_id.room_type', string="Room Type", store=True, readonly=True)
     hotel_id = fields.Many2one('hotel.hotel', related='room_id.hotel_id', store=True)
     booking_date = fields.Date(string='Booking Date', default=fields.Date.context_today, readonly=True)
     check_in_date = fields.Date(string='Check-in Date', required=True)
     check_out_date = fields.Date(string='Check-out Date', required=True)
     create_uid = fields.Many2one('res.users', string='Created By', default=lambda self: self.env.user)
-    guest_name = fields.Char(string='Guest Name', required=True)
+    guest_name = fields.Char(string='Guest Name', required=True, tracking=True)
     guest_contact = fields.Char(string='Guest Contact')
     booking_status = fields.Selection([
         ('draft', 'Draft'),
@@ -31,7 +29,7 @@ class HotelBooking(models.Model):
         ('checked_out', 'Checked Out'),
         ('cancelled', 'Cancelled')
     ], string='Booking Status', default='new')
-    room_price = fields.Float(related='room_id.room_price', string='Room Price', readonly=True)
+    room_price = fields.Float(related='room_id.current_price', string='Room Price', readonly=True)
     currency_id = fields.Many2one('res.currency', string='Currency',
                                   default=lambda self: self.env.company.currency_id)
     total_nights = fields.Integer(string='Total Nights', compute='_compute_total_nights', store=True)
@@ -43,6 +41,26 @@ class HotelBooking(models.Model):
     payment_date = fields.Datetime(string='Payment Date', readonly=True)
     payment_amount = fields.Float(string='Payment Amount', readonly=True, compute='_compute_payment_amount', store=True)
     sale_order_id = fields.Many2one('sale.order', string='Sale Order', readonly=True)
+
+    def action_create_sale_order(self):
+        # Tạo SO khi confirm booking
+        product = self.env['product.product'].search([('default_code', '=', 'ROOM_SERVICE')], limit=1)
+        if not product:
+            product = self.env['product.product'].create({
+                'name': 'Room Service',
+                'type': 'service',
+                'default_code': 'ROOM_SERVICE'
+            })
+
+        sale_order = self.env['sale.order'].create({
+            'partner_id': self.guest_id.id,
+            'order_line': [(0, 0, {
+                'product_id': product.id,
+                'product_uom_qty': self.total_nights,
+                'price_unit': self.room_id.room_price
+            })]
+        })
+        self.sale_order_id = sale_order.id
 
     def action_open_payment_wizard(self):
         return {
@@ -93,18 +111,24 @@ class HotelBooking(models.Model):
 
     def unlink(self):
         for booking in self:
-            if booking.booking_status not in ['draft', 'cancelled']:
-                raise ValidationError('Only bookings in Draft or Cancelled status can be deleted.')
-            if not self.env.user.has_group('hotel.group_hotel_manager'):
-                raise ValidationError('Only managers can delete bookings.')
+            # Nếu người dùng không phải là admin
+            if not self.env.user.has_group('base.group_system'):
+                # Áp dụng quy tắc trạng thái
+                if booking.booking_status not in ['draft', 'cancelled']:
+                    raise ValidationError('Only bookings in Draft or Cancelled status can be deleted.')
+
+            # Chỉ admin mới được vượt qua quy tắc trạng thái
+            if not (self.env.user.has_group('hotel_management_module.group_hotel_manager') or
+                    self.env.user.has_group('base.group_system')):
+                raise ValidationError('Only managers or admin can delete bookings.')
+
         return super(HotelBooking, self).unlink()
 
     @api.model
     def create(self, vals):
-        if 'booking_code' not in vals or not vals['booking_code']:
-            sequence_code = self.env['ir.sequence'].next_by_code('hotel.booking')
-            vals['booking_code'] = sequence_code or '/'
-        return super(HotelBooking, self).create(vals)
+        if not vals.get('booking_code'):
+            vals['booking_code'] = self.env['ir.sequence'].next_by_code('hotel.booking')
+        return super().create(vals)
 
     @api.depends('check_in_date', 'check_out_date')
     def _compute_total_nights(self):
@@ -115,10 +139,25 @@ class HotelBooking(models.Model):
             else:
                 booking.total_nights = 0
 
-    @api.depends('total_nights', 'room_id.room_price')
+    @api.depends('check_in_date', 'check_out_date', 'room_id')
     def _compute_total_amount(self):
         for booking in self:
-            booking.total_amount = booking.total_nights * booking.room_id.room_price
+            if not (booking.check_in_date and booking.check_out_date and booking.room_id):
+                booking.total_amount = 0
+                continue
+
+            total = 0
+            current_date = booking.check_in_date
+            while current_date < booking.check_out_date:
+                # Kiểm tra xem ngày hiện tại có phải cuối tuần không
+                is_weekend = current_date.weekday() >= 5
+                if is_weekend:
+                    total += booking.room_id.room_price * 1.5
+                else:
+                    total += booking.room_id.room_price
+                current_date += timedelta(days=1)
+
+            booking.total_amount = total
 
     @api.depends('total_amount', 'sale_order_id.amount_total')
     def _compute_payment_amount(self):
@@ -173,7 +212,7 @@ class HotelBooking(models.Model):
                 'order_id': sale_order.id,
                 'name': product.name,
                 'product_uom_qty': max(duration, 1),
-                'price_unit': record.room_price,
+                'price_unit': record.total_amount,
                 'product_id': product.id,
             })
 
@@ -201,6 +240,13 @@ class HotelBooking(models.Model):
     @api.constrains('room_id', 'check_in_date', 'check_out_date')
     def _check_room_availability(self):
         for booking in self:
+            if not booking.room_id.room_active:
+                raise ValidationError('This room is inactive and cannot be booked.')
+
+            if booking.room_id.room_status in ['maintenance', 'occupied']:
+                raise ValidationError('This room is not available for booking.')
+
+            # Kiểm tra trùng lịch đặt phòng
             overlapping_bookings = self.search([
                 ('room_id', '=', booking.room_id.id),
                 ('id', '!=', booking.id),
@@ -216,14 +262,22 @@ class HotelBooking(models.Model):
         self._send_status_update_email()
 
     def action_check_in(self):
-        self.write({'booking_status': 'checked_in'})
-        self.room_id.write({'room_status': 'occupied', 'last_rented_date': fields.Date.context_today(self)})
-        self._send_status_update_email()
+        for booking in self:
+            if booking.booking_status != 'confirmed':
+                raise ValidationError("Only confirmed bookings can be checked in.")
+            booking.write({'booking_status': 'checked_in'})
+            # Update the room status to 'occupied'
+            booking.room_id.sudo().write({'room_status': 'occupied'})
+            booking._send_status_update_email()
 
     def action_check_out(self):
-        self.write({'booking_status': 'checked_out'})
-        self.room_id.write({'room_status': 'available'})
-        self._send_status_update_email()
+        for booking in self:
+            if booking.booking_status != 'checked_in':
+                raise ValidationError("Only checked-in bookings can be checked out.")
+            booking.write({'booking_status': 'checked_out'})
+            # Update the room status to 'available'
+            booking.room_id.sudo().write({'room_status': 'available'})
+            booking._send_status_update_email()
 
     def _send_status_update_email(self):
         manager = self.hotel_id.manager_id
@@ -244,3 +298,11 @@ class HotelBooking(models.Model):
                 record.write({'booking_status': 'confirmed'})
             else:
                 raise ValidationError("Only bookings in 'New' status can be approved.")
+
+    def action_cancel(self):
+        if self.booking_status in ['checked_in', 'checked_out']:
+            raise ValidationError('Cannot cancel a booking that is already checked in or completed.')
+        self.write({
+            'booking_status': 'cancelled',
+            'room_id': False  # Optionally release the room
+        })

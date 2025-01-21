@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+<!--    Action-->
     <record id="report_hotel_booking" model="ir.actions.report">
         <field name="name">Booking Confirmation</field>
         <field name="model">hotel.booking</field>
@@ -10,6 +11,7 @@
         <field name="binding_type">report</field>
     </record>
 
+<!--    Template-->
     <template id="report_booking_template">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="booking">

@@ -43,7 +43,7 @@
                                     <list string="Rooms" editable="bottom">
                                         <field name="room_code"/>
                                         <field name="room_name"/>
-                                        <field name="bed_type"/>
+                                        <field name="room_type"/>
                                         <field name="room_price"/>
                                         <field name="room_status"/>
                                         <field name="room_active"/>

@@ -10,10 +10,12 @@
                     <field name="room_code"/>
                     <field name="room_name"/>
                     <field name="hotel_id"/>
-                    <field name="bed_type"/>
+                    <field name="room_type"/>
                     <field name="room_price"/>
-                    <field name="room_status"/>
-                    <field name="room_active"/>
+                    <field name="room_status" decoration-danger="room_status=='maintenance'"
+                           decoration-warning="room_status=='occupied'"
+                           decoration-success="room_status=='available'"/>
+                    <field name="room_active" widget="boolean_toggle"/>
                     <field name="last_rented_date"/>
                 </list>
             </field>
@@ -25,14 +27,28 @@
             <field name="model">hotel.room</field>
             <field name="arch" type="xml">
                 <form>
+                    <header>
+                        <field name="room_status" widget="statusbar"
+                               statusbar_visible="available,occupied,maintenance"/>
+                    </header>
                     <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <widget name="web_ribbon" text="Archived" bg_color="bg-danger"
+                                    invisible="room_active == True"/>
+                            <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                                <field name="room_active" widget="boolean_button"/>
+                            </button>
+                        </div>
                         <group>
                             <field name="room_code"/>
                             <field name="room_name"/>
-                            <field name="hotel_id"/>
-                            <field name="bed_type"/>
+                            <field name="hotel_id"
+                                   options="{'no_create': True, 'no_open': True}"/>
+                            <field name="room_type"/>
+                        </group>
+                        <group>
                             <field name="room_price"/>
-                            <field name="feature_ids"/>
+                            <field name="feature_ids" widget="many2many_tags"/>
                             <field name="room_status"/>
                             <field name="last_rented_date"/>
                         </group>
@@ -40,14 +56,26 @@
                             <field name="room_active"/>
                         </group>
                         <notebook>
-                            <page string="Features">
-                                <field name="feature_ids"/>
-                            </page>
-                            <page string="Bookings">
-                                <field name="booking_ids"/>
+                            <page string="Bookings" name="bookings">
+                                <field name="booking_ids" readonly="1">
+                                    <list>
+                                        <field name="booking_code"/>
+                                        <field name="guest_name"/>
+                                        <field name="check_in_date"/>
+                                        <field name="check_out_date"/>
+                                        <field name="total_amount"/>
+                                        <field name="booking_status"/>
+                                        <field name="payment_status"/>
+                                    </list>
+                                </field>
                             </page>
                         </notebook>
                     </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="message_ids"/>
+                        <field name="activity_ids"/>
+                    </div>
                 </form>
             </field>
         </record>
@@ -61,9 +89,51 @@
                     <field name="room_code"/>
                     <field name="room_name"/>
                     <field name="hotel_id"/>
+                    <separator/>
+                    <filter string="Available" name="available"
+                            domain="[('room_status', '=', 'available')]"/>
+                    <filter string="Occupied" name="occupied"
+                            domain="[('room_status', '=', 'occupied')]"/>
+                    <filter string="Maintenance" name="maintenance"
+                            domain="[('room_status', '=', 'maintenance')]"/>
+                    <filter string="Active" name="active" domain="[('room_active', '=', True)]"/>
+                    <group expand="0" string="Group By">
+                        <filter string="Hotel" name="hotel" context="{'group_by':'hotel_id'}"/>
+                        <filter string="Room Type" name="type" context="{'group_by':'room_type'}"/>
+                        <filter string="Status" name="status" context="{'group_by':'room_status'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- Cập nhật view cho embedded room list trong hotel form -->
+        <record id="view_room_list_embedded" model="ir.ui.view">
+            <field name="name">hotel.room.list.embedded</field>
+            <field name="model">hotel.room</field>
+            <field name="arch" type="xml">
+                <list editable="bottom">
+                    <field name="room_code"/>
+                    <field name="room_name"/>
+                    <field name="room_type"/>
                     <field name="room_price"/>
                     <field name="room_status"/>
-                </search>
+                    <field name="room_active" widget="boolean_toggle"/>
+                </list>
+            </field>
+        </record>
+
+        <!-- Cập nhật Hotel Form View để sử dụng embedded room list mới -->
+        <record id="view_hotel_form_updated" model="ir.ui.view">
+            <field name="name">hotel.hotel.form.updated</field>
+            <field name="model">hotel.hotel</field>
+            <field name="inherit_id" ref="hotel_management_module.view_hotel_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='room_ids']" position="attributes">
+                    <attribute name="view_mode">list</attribute>
+                    <attribute name="views">
+                        [(ref('view_room_list_embedded'), 'list')]
+                    </attribute>
+                </xpath>
             </field>
         </record>
 
