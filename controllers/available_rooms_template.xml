@@ -1,0 +1,44 @@
+<odoo>
+    <data>
+        <template id="available_rooms_template" name="Available Rooms Template">
+            <t t-call="website.layout">
+                <div class="container">
+                    <h1>Available Rooms</h1>
+                    <form action="/rooms/available" method="GET">
+                        <label for="start_date">Start Date:</label>
+                        <input type="date" name="start_date" t-att-value="start_date"  />
+                        <label for="end_date">End Date:</label>
+                        <input type="date" name="end_date" t-att-value="end_date" />
+                        <button type="submit">Filter</button>
+                    </form>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Room Name</th>
+                                <th>Hotel Name</th>
+                                <th>Weekday Price</th>
+                                <th>Weekend Price</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="rooms" t-as="room">
+                                <tr>
+                                    <td><t t-esc="room.room_code" /></td>
+                                    <td><t t-esc="room.hotel_id.name" /></td>
+                                    <td><t t-esc="room.weekday_price" /></td>
+                                    <td><t t-esc="room.weekend_price" /></td>
+                                    <td><t t-esc="room.state" /></td>
+                                    <td>
+                                        <a t-att-href="'/book/room/' + str(room.id)" class="btn btn-primary">Book Now</a>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>

@@ -1,0 +1,71 @@
+<odoo>
+    <data>
+        <template id="report_available_room">
+            <t t-call="web.html_container">
+                <t t-call="web.external_layout">
+                    <t t-set="head_styles">
+                        <style>
+                            * {
+                            font-family: "DejaVu Sans", sans-serif;
+                            }
+                        </style>
+                    </t>
+                    <div>
+                        <h2>Available room report</h2>
+                        <p style="font-size: 12px; color: gray;">
+                            Note: Prices are based on the date of report generation. Weekend price is 1.5 times the
+                            weekday price.
+                        </p>
+                        <t t-if="docs">
+                            <table class="table table-bordered2">
+                                <thead>
+                                    <tr>
+                                        <th>Room Code</th>
+                                        <th>Room Type</th>
+                                        <th>Current Price</th>
+                                        <th>Room Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="docs" t-as="room">
+                                        <tr>
+                                            <td>
+                                                <t t-esc="room.room_code"/>
+                                            </td>
+                                            <td>
+                                                <t t-esc="{
+                                            'single': 'Single Bed',
+                                            'double': 'Double Bed',
+                                            'suite': 'Suites'
+                                        }.get(room.room_type, 'Unknown')"/>
+                                            </td>
+                                            <td>
+                                                <t t-esc="room.current_price"/>
+                                            </td>
+                                            <td>
+                                                <t t-esc="room.room_status"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </t>
+                    </div>
+                </t>
+            </t>
+        </template>
+
+
+        <!-- Report Action -->
+        <record id="action_report_available_room" model="ir.actions.report">
+            <field name="name">Available room report</field>
+            <field name="model">hotel.room</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">hotel_management_module.report_available_room</field>
+            <field name="report_file">hotel_management_module.report_available_room</field>
+            <field name="print_report_name">'Available room'</field>
+            <field name="binding_model_id" ref="model_hotel_room"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

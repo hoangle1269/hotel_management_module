@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_hotel_booking">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <style>
+                        body {
+                        font-family: 'Arial', sans-serif;
+                        font-size: 18px;
+                        color: #333;
+                        line-height: 1.6;
+                        }
+
+                        h2, h4 {
+                        color: #2F4F4F; /* Màu xanh đậm */
+                        text-transform: uppercase;
+                        margin-bottom: 10px;
+                        }
+
+                        h2 {
+                        font-size: 22px;
+                        font-weight: bold;
+                        text-align: center;
+                        }
+
+                        h4 {
+                        font-size: 16px;
+                        font-weight: bold;
+                        margin-top: 20px;
+                        margin-bottom: 15px;
+                        }
+
+                        table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
+                        }
+
+                        table.table-borderless td {
+                        border: none;
+                        padding: 5px 0;
+                        }
+
+                        table.table-bordered2 th {
+                        background-color: #F4A460; /* Màu nền cam nhạt */
+                        color: white;
+                        font-size: 14px;
+                        text-transform: uppercase;
+                        text-align: left;
+                        padding: 8px;
+                        }
+
+                        table.table-bordered2 td {
+                        border: 1px solid #ddd; /* Đường viền nhạt */
+                        padding: 8px;
+                        font-size: 14px;
+                        text-align: left;
+                        }
+
+                        table.table-bordered2 tr:nth-child(even) {
+                        background-color: #f9f9f9; /* Màu nền xám nhạt cho dòng chẵn */
+                        }
+
+                        table.table-bordered2 tr:nth-child(odd) {
+                        background-color: #ffffff; /* Màu nền trắng cho dòng lẻ */
+                        }
+
+                        .text-center {
+                        text-align: center;
+                        }
+
+                        .mt-4 {
+                        margin-top: 20px;
+                        }
+
+                        .mt-5 {
+                        margin-top: 40px;
+                        }
+
+                        .row {
+                        display: flex;
+                        justify-content: space-between;
+                        }
+
+                        .col-6 {
+                        width: 48%;
+                        }
+
+                        .col-6 p {
+                        margin: 0;
+                        font-size: 14px;
+                        }
+
+                        p {
+                        margin: 5px 0;
+                        }
+
+                        strong {
+                        color: #000; /* Màu đậm */
+                        }
+
+                        .signature {
+                        margin-top: 50px;
+                        }
+
+                        .signature p {
+                        margin-top: 50px;
+                        }
+                    </style>
+
+                    <body>
+                        <div class="page">
+                            <!-- Header -->
+                            <div class="text-center">
+                                <h2>Booking form</h2>
+                                <p>Booking code:
+                                    <strong>
+                                        <span t-field="o.booking_code"/>
+                                    </strong>
+                                </p>
+                            </div>
+                            <div>
+                                <!-- Thông tin khách hàng -->
+                                <div class="mt-4">
+                                    <h4>Customer information</h4>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td width="30%">
+                                                <strong>Customer name:</strong>
+                                            </td>
+                                            <td>
+                                                <span t-field="o.guest_name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Booking date:</strong>
+                                            </td>
+                                            <td>
+                                                <span t-field="o.booking_date"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                                <div class="mt-4">
+                                    <h4>Booking information</h4>
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td width="30%">
+                                                <strong>Hotel:</strong>
+                                            </td>
+                                            <td>
+                                                <span t-field="o.hotel_id"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Room_type:</strong>
+                                            </td>
+                                            <td>
+                                                <span t-field="o.room_type"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Room_name:</strong>
+                                            </td>
+                                            <td>
+                                                <span t-field="o.room_name"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Check-in date:</strong>
+                                            </td>
+                                            <td>
+                                                <span t-field="o.check_in_date"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <strong>Check-out date:</strong>
+                                            </td>
+                                            <td>
+                                                <span t-field="o.check_out_date"/>
+                                            </td>
+                                        </tr>
+
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Dịch vụ đi kèm -->
+                            <div class="mt-5">
+                                <h4>Additional service</h4>
+                                <table class="table table-bordered2">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Service</th>
+                                            <th>Quantity</th>
+                                            <th>Price</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-foreach="o.service_line" t-as="line">
+                                            <tr>
+                                                <td>
+                                                    <span t-esc="line_index + 1"/>
+                                                </td>
+                                                <td>
+                                                    <span t-field="line.product_id"/>
+                                                </td>
+                                                <td>
+                                                    <span t-field="line.quantity"/>
+                                                </td>
+                                                <td>
+                                                    <span t-field="line.price_unit"
+                                                          t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                                </td>
+                                                <td>
+                                                    <span t-field="line.subtotal"
+                                                          t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Thông tin thanh toán -->
+                            <div class="mt-4">
+                                <h4>Payment information</h4>
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td width="30%">
+                                            <strong>Room price:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.current_price"
+                                                  t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Total nights:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.total_nights"/>
+                                            nights
+                                        </td>
+                                    </tr>
+
+                                    <tr>
+                                        <td>
+                                            <strong>Total room amount:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.room_total"
+                                                  t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Total service amount:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.total_service_amount"
+                                                  t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Tax:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.tax_amount"
+                                                  t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Total amount:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.payment_amount"
+                                                  t-options='{"widget": "monetary", "display_currency": user.company_id.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Payment status:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.payment_status"/>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <strong>Payment date:</strong>
+                                        </td>
+                                        <td>
+                                            <span t-field="o.payment_date"/>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="row mt-5">
+                                <div class="col-6 text-center">
+                                    <p>Customer</p>
+                                    <p>(Sign and full name)</p>
+                                    <br/>
+                                    <br/>
+                                    <br/>
+                                    <p>
+                                        <span t-field="o.guest_name"/>
+                                    </p>
+                                </div>
+                                <div class="col-6 text-center">
+                                    <p>Employee</p>
+                                    <p>(Sign and full name)</p>
+                                    <br/>
+                                    <br/>
+                                    <br/>
+                                    <p>................................</p>
+                                </div>
+                            </div>
+                        </div>
+                    </body>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <!-- Action -->
+    <record id="action_report_booking" model="ir.actions.report">
+        <field name="name">Booking Form</field>
+        <field name="model">hotel.booking</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">hotel_management_module.report_hotel_booking</field>
+        <field name="report_file">hotel_management_module.report_hotel_booking</field>
+        <field name="print_report_name">'Booking form - %s' % object.booking_code</field>
+        <field name="binding_model_id" ref="model_hotel_booking"/>
+        <field name="binding_type">report</field>
+    </record>
+</odoo>

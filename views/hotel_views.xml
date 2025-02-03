@@ -78,5 +78,11 @@
             <field name="view_mode">list,form</field>
             <!--        <field name="context">{}</field>-->
         </record>
+
+        <menuitem id="menu_hotel_root" name="Hotel Management" sequence="1"/>
+        <menuitem id="menu_hotel" name="Hotels"
+                  parent="menu_hotel_root"
+                  action="action_hotel" sequence="20"/>
+
     </data>
 </odoo>

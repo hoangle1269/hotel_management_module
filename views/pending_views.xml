@@ -38,5 +38,9 @@
             <field name="domain">[('booking_status', '=', 'new')]</field>
         </record>
 
+        <menuitem id="menu_booking_pending" name="Pending"
+                  parent="menu_hotel_root"
+                  action="action_booking_pending" sequence="40"/>
+
     </data>
 </odoo>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="view_available_rooms_wizard" model="ir.ui.view">
+            <field name="name">available.rooms.wizard.form</field>
+            <field name="model">available.rooms.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Available Rooms">
+                    <group>
+                        <field name="start_date" required="1"/>
+                        <field name="end_date"/>
+                    </group>
+                    <footer>
+                        <button string="Search" type="object" name="action_get_available_rooms" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_available_rooms_wizard" model="ir.actions.act_window">
+            <field name="name">Available Rooms</field>
+            <field name="res_model">available.rooms.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field> <!-- target is "new" if wizard -->
+        </record>
+
+        <menuitem id="menu_reports"
+                  name="Reports"
+                  parent="menu_hotel_root"
+                  sequence="60"/>
+
+        <menuitem id="menu_report_available_room"
+                  name="Available Rooms"
+                  parent="menu_reports"
+                  action="action_available_rooms_wizard"
+                  sequence="10"/>
+
+    </data>
+</odoo>

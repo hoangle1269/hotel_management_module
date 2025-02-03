@@ -1,0 +1,50 @@
+<odoo>
+    <data>
+        <template id="book_room_template" name="Book Room Template">
+            <t t-call="website.layout">
+                <div class="container">
+                    <h1>Book Room</h1>
+                    <form action="/confirm/booking" method="post">
+                        <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                        <input type="hidden" name="room_id" t-att-value="room.id"/>
+                        <input type="hidden" name="hotel_id" t-att-value="room.hotel_id.id"/>
+                        <input type="hidden" name="room_type" t-att-value="room.bed_type"/>
+                        <input type="hidden" name="booking_code" t-att-value="booking_code"/>
+                        <div>
+                            <label>Room Name:</label>
+                            <span>
+                                <t t-esc="room.room_code"/>
+                            </span>
+                        </div>
+                        <div>
+                            <label>Hotel Name:</label>
+                            <span>
+                                <t t-esc="room.hotel_id.name"/>
+                            </span>
+                        </div>
+                        <div>
+                            <label>Booking Date:</label>
+                            <span>
+                                <t t-esc="booking_date"/>
+                            </span>
+                        </div>
+                        <div>
+                            <label>Customer Name:</label>
+                            <input type="text" name="guest_name"/>
+                        </div>
+                        <div>
+                            <label>Check-in Date:</label>
+                            <input type="date" name="check_in_date"/>
+                        </div>
+                        <div>
+                            <label>Check-out Date:</label>
+                            <input type="date" name="check_out_date"/>
+                        </div>
+                        <button type="submit">Confirm Booking</button>
+                    </form>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</odoo>

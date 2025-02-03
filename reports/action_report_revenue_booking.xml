@@ -1,0 +1,57 @@
+<odoo>
+    <data>
+        <template id="report_revenue_booking">
+            <t t-call="web.html_container">
+                 <t t-call="web.external_layout">
+                     <t t-set="head_styles">
+                        <style>
+                            * {
+                                font-family: "DejaVu Sans", sans-serif;
+                            }
+                        </style>
+                    </t>
+                    <div>
+                        <h2><strong>Báo Cáo Doanh Thu</strong></h2>
+                        <t t-set="total_payment" t-value="0.0"/>
+                        <table class="table table-bordered2">
+                            <thead>
+                                <tr>
+                                    <th>Mã Booking</th>
+                                    <th>Khách Hàng</th>
+                                    <th>Ngày Check-in</th>
+                                    <th>Ngày Check-out</th>
+                                    <th>Số Tiền Thanh Toán</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="docs" t-as="booking">
+                                    <t t-set="total_payment" t-value="total_payment + booking.payment_amount"/>
+                                    <tr>
+                                        <td><t t-esc="booking.booking_code"/></td>
+                                        <td><t t-esc="booking.guest_name"/></td>
+                                        <td><t t-esc="booking.check_in_date"/></td>
+                                        <td><t t-esc="booking.check_out_date"/></td>
+                                        <td><t t-esc="booking.payment_amount"/> VND</td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <!-- Hiển thị tổng cộng -->
+                        <p><strong>Tổng Doanh Thu:</strong> <t t-esc="total_payment"/> VND</p>
+                    </div>
+                 </t>
+            </t>
+        </template>
+
+        <record id="action_report_revenue_booking" model="ir.actions.report">
+            <field name="name">Revenue report</field>
+            <field name="model">hotel.booking</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">hotel_management_module.report_revenue_booking</field>
+            <field name="report_file">hotel_management_module.report_revenue_booking</field>
+            <field name="print_report_name">'Revenue report'</field>
+            <field name="binding_model_id" ref="model_hotel_booking"/>
+            <field name="binding_type">report</field>
+        </record>
+    </data>
+</odoo>

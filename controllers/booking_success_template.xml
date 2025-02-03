@@ -1,0 +1,13 @@
+<odoo>
+    <data>
+        <template id="booking_success_template" name="Booking Success Template">
+            <t t-call="website.layout">
+                <div class="container">
+                    <h1>Booking Successful!</h1>
+                    <p>Your booking code: <strong><t t-esc="booking_code" /></strong></p>
+                    <a href="/rooms/available">Go back to Available Rooms</a>
+                </div>
+            </t>
+        </template>
+    </data>
+</odoo>

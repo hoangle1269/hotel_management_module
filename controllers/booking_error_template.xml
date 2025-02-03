@@ -1,0 +1,14 @@
+<odoo>
+    <data>
+        <template id="booking_error_template" name="Booking Error Template">
+            <t t-call="website.layout">
+                <div class="container">
+                    <h1>Booking Error</h1>
+                    <p>Error: <strong><t t-esc="error" /></strong></p>
+                    <a href="/rooms/available">Try Again</a>
+                </div>
+            </t>
+        </template>
+
+    </data>
+</odoo>

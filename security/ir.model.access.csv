@@ -14,3 +14,6 @@ access_hotel_booking_admin,hotel.booking.admin,model_hotel_booking,group_hotel_a
 access_hotel_payment_wizard_employee,hotel.payment.wizard.employee,model_booking_payment_wizard,group_hotel_employee,1,1,1,0
 access_hotel_payment_wizard_manager,hotel.payment.wizard.manager,model_booking_payment_wizard,group_hotel_manager,1,1,1,1
 access_hotel_payment_wizard_admin,hotel.payment.wizard.admin,model_booking_payment_wizard,group_hotel_admin,1,1,1,1
+access_custom_booking_service_line_user,access.custom.booking.service.line.user,model_custom_booking_service_line,base.group_user,1,1,1,1
+access_available_rooms_wizard,access_available_rooms_wizard,model_available_rooms_wizard,base.group_user,1,1,1,1
+access_revenue_report_wizard,access_revenue_report_wizard,model_revenue_report_wizard,base.group_user,1,1,1,1

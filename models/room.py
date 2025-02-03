@@ -37,6 +37,18 @@ class HotelRoom(models.Model):
         ('unique_room_code_hotel', 'UNIQUE(room_code, hotel_id)', 'Room code must be unique per hotel!')
     ]
 
+    def get_available_rooms(self, start_date, end_date=None):
+        end_date = end_date or start_date
+        # find available roomin a period
+        booked_rooms = self.env['hotel.booking'].search([
+            ('check_in_date', '<=', end_date),
+            ('check_out_date', '>=', start_date)
+        ]).mapped('room_id')
+
+        # Lọc ra các phòng trống
+        available_rooms = self.search([('id', 'not in', booked_rooms.ids)])
+        return available_rooms
+
     @api.depends('room_price')
     def _compute_current_price(self):
         today = fields.Date.today()

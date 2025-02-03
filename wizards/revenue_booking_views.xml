@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <data>
+        <record id="view_revenue_report_wizard_form" model="ir.ui.view">
+            <field name="name">revenue.report.wizard.form</field>
+            <field name="model">revenue.report.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Revenue Report Wizard">
+                    <group>
+                        <field name="time_period" widget="radio"/>
+                    </group>
+                    <group>
+                        <field name="start_date"/>
+                        <field name="end_date"/>
+                    </group>
+                    <footer>
+                        <button string="Confirm" type="object" name="action_generate_revenue_report"
+                                class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_revenue_report_wizard" model="ir.actions.act_window">
+            <field name="name">Revenue Booking</field>
+            <field name="res_model">revenue.report.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem id="menu_report_revenue_booking"
+                  name="Revenue Booking"
+                  parent="menu_reports"
+                  action="action_revenue_report_wizard"
+                  sequence="20"/>
+
+    </data>
+</odoo>
